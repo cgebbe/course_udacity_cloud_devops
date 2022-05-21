@@ -40,8 +40,15 @@
   - [Messaging & Containers](#messaging--containers)
     - [Simple Notification Service (SNS)](#simple-notification-service-sns)
     - [Simple Queue Service (SQS)](#simple-queue-service-sqs)
+    - [Lab: SNS](#lab-sns)
     - [Elastic Container Service (ECS)](#elastic-container-service-ecs)
   - [AWS Management](#aws-management)
+    - [Logging](#logging)
+    - [Cloud trail](#cloud-trail)
+    - [Cloudwatch](#cloudwatch)
+    - [Lab: Cloudwatch](#lab-cloudwatch)
+    - [Infrastructure as Code (IaC) & CloudFormation](#infrastructure-as-code-iac--cloudformation)
+    - [AWS CLI](#aws-cli)
   - [PROJECT: deploy static website on AWS](#project-deploy-static-website-on-aws)
 
 # Cloud fundamentals
@@ -244,6 +251,7 @@ okay, easy to setup
 ### Elastic Beanstalk
 
 Elastic Beanstalk...
+
 - is used to deploy web applications to the cloud more quickly
 - can spin up many AWS services like...
   - EC2
@@ -254,19 +262,20 @@ Elastic Beanstalk...
   - security groups
 - can deploy web applications to those servers in many languages (Java, Python, Docker, ...)
 
-
 ## Storage & content delivery
 
 ### Storage in the cloud
 
 Important features are
+
 - durability
 - availability
 - scalability
 
-### S3 
+### S3
 
 S3 buckets...
+
 - live in a region
 - must have a globally unique name
 - can be used for...
@@ -277,12 +286,14 @@ S3 buckets...
 ### DynamoDB
 
 DynamoDB...
+
 - is a NoSQL database
 - can scale quickly
 - can deal with large amounts
 - is fully managed (hardware, configuration, software paching, cluster scaling)
 
 NoSQL databases...
+
 - are schema less and therefore very flexible (too flexible?)
 - store data in json
 - each row in a table is a document
@@ -291,6 +302,7 @@ NoSQL databases...
 ### RDS
 
 Relational Database Service...
+
 - is fully managed by AWS (see above)
 - supports Oracle, PostgreSQL, MySQL, Aurora (AWS specific)
 
@@ -305,9 +317,10 @@ Relational Database Service...
 
 ### Cloudfront = Content Delivery Network (CDN)
 
-A Content Delivery Network (or CDN) speeds up delivery of your static and dynamic web content by *caching* content in an Edge Location close to your user base.
+A Content Delivery Network (or CDN) speeds up delivery of your static and dynamic web content by _caching_ content in an Edge Location close to your user base.
 
 Cloudfront...
+
 - is the AWS service for a CDN
 - can be configured for e.g. caching an S3 bucket
 - origin = source
@@ -341,6 +354,7 @@ Cloudfront...
 - also setup multi factor authentification (MFA) for your root account
 
 IAM distinguishes between
+
 - IAM User = person or service
   - has dentials**permanent** username and access credenticals
 - IAM Group = collection of person
@@ -351,11 +365,13 @@ IAM distinguishes between
 - EC2 security group = **Not a part of IAM**, but associated with an EC2 instance. Act as a built-in firewall.
 
 Difference beetween IAM user and IAM role ([SO-post](https://stackoverflow.com/questions/46199680/difference-between-iam-role-and-iam-user-in-aws)):
+
 - users are used for authentification (who are you?)
 - roles are used for authorization (are you allowed to do this?)
 - only users have a password and an access key
 
 AWS supports three different role types:
+
 - attached to services (e.g. EC2)
 - attached to users from other AWS accounts
 - attached to users authentificated by a trusted external system
@@ -367,11 +383,13 @@ AWS supports three different role types:
 ### DNS
 
 Domain Name System (DNS)
-- allows to route http://www.google.com to http://74.25.21.147 
+
+- allows to route http://www.google.com to http://74.25.21.147
 - is a decentralized database
 - sidenote: IPv4 addresses have already been depleted since ~2011.
-  
-How does DNS *resolution* work? (resolution = conversion of hostname to IP-address)
+
+How does DNS _resolution_ work? (resolution = conversion of hostname to IP-address)
+
 - local computer asks nearby DNS server for www.test.example.com
 - If DNS server hasn't cached answer already, it...
   - asks root domain `.` to find out the addresses of the nameservers for `.com` (root domain server is always configured!)
@@ -388,13 +406,14 @@ How does DNS *resolution* work? (resolution = conversion of hostname to IP-addre
 - scales automatically to manage spikes in DNS queries
 - allows you to register a domain name (or manage an existing)
 - routes internet traffic to the resources for your domain
-- Allows *DNS failover*:
+- Allows _DNS failover_:
   - checks health of resource
   - if resources is unavailable, routes to different IP-address
 
 ### Elasticity
 
 Scaling...
+
 - has the biggest benefit of
   - not needing guessing demand
   - not under- or overutilizing in-premise servers
@@ -407,18 +426,20 @@ Scaling...
 - scales EC2 instances based on your conditions
 - works with AWS message services like simple notification service (SNS) to alert you of events (e.g. scale up or down)
 
-*AWS autoscaling*
+_AWS autoscaling_
+
 - is different than EC2 autoscaling!
 - works with other services such as DynamoDB
 
 Autoscaling Group requires to define...
+
 - desired instance count
-- EC2 launch template 
+- EC2 launch template
 - scaling policy to define WHEN to scale
 
 ### Elastic Load Balancer (ELB)
 
-- stands *in front of* a web server
+- stands _in front of_ a web server
 - balances load between two or more servers
 - provides redundancy and performance
 - it can add more servers?! Not sure...
@@ -427,28 +448,29 @@ Autoscaling Group requires to define...
   - containers
   - IP-addresses
   - Lambda functions
-- comes as 
+- comes as
   - Application Load Balancer (HTTPs)
     - can parse HTTP request and route based on that
   - Network Load Balancer (TCP/UDP)
     - can only analyze TCP packet
 
 Example:
+
 - two running EC2 instances (NOT in autoscaling)
 - ELB in front of them
 
 ### Exercise: Launch two EC2 instances and an ELB
 
 Notes:
+
 - HTTPS vs. HTTP
   - HTTPS uses TLS (SSL) to encrypt HTTP requests and response
   - When a client opens a HTTPS website, the server shares the public key is shared with the client. Using this key, they aggree on session keys, which are used to encrypt any subsequent communication.
   - configuring SSL may be a bit tricky on the amazon linux 2 AMI, see https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/SSL-on-amazon-linux-2.html
-  - 
+  -
 
 echo "<?php phpinfo(); ?>" > /var/www/html/phpinfo.php
 echo "<? echo Welcome to server 2>" > /var/www/html/phpinfo.php
-
 
 ## Messaging & Containers
 
@@ -456,27 +478,126 @@ echo "<? echo Welcome to server 2>" > /var/www/html/phpinfo.php
 
 - typically occurs between internet-based applications and devices (from system to system)
 - decouples notification logic from your App
-- uses publish/subscribe model and **topics**
+- uses publish/subscribe mechansim (_topics_)
+  - no need to poll for updates!
 - Possible subscribers are
   - Person
   - Other AWS services
   - mobile push
   - text messages
   - Email
-- Message are processed in a queue (FIFO) - asynchronously
+  - SQS queue
+    - thereby, message can persist for other applications to process at a later time
+    - FIFO topics can only have SQS subscribers
 
 ### Simple Queue Service (SQS)
 
 - managed queue service
+- uses a push/pull mechanism
+  - receivers need to poll/pull messages
 - send, store and receive messages
 - two types of queues
   - FIFO (exactly once and in exact order)
-  - standard ("best-effort-ordering"?)
+    - supports up to 3000 messages/seconds
+  - standard
+    - "best-effort-ordering", but no guarantees
+    - support unlimited messages/secondss
+    - messages could be delivered more than once (but at least once)
+- SQS pricing depends on size and count of message as well as interactions with S3 and AWS Key Management Service
 
+### Lab: SNS
 
+- create SNS topic
+- create subscriber (push to email)
+- publish a message
 
 ### Elastic Container Service (ECS)
 
+- is a managed orchestration service
+- can
+  - launch and stop docker containers
+  - scale containers
+  - query state of containers
+- supports other AWS services like load balancing, security groups, EBS volumes, IAM roles
+- can be found under AWS Compute section
+- uses the following terms
+  - _task definition_ = container definition including
+    - launch type?!
+      - AWS Fargate = serverless (price per task size)
+      - AWS EC2 = on amazon EC2 servers (price per resource usage) ?!?
+    - image
+    - memory limits
+    - port mappings
+    - ...
+  - _ECS cluster_ = set of container instances running the (same?) container agent
+  - _container agent_ = utility that connects container instance to one cluster (?!)
+
+TODO: Delete...
+
+- SNS
+- ECS cluster
+
 ## AWS Management
 
+### Logging
+
+allows you to see..
+
+- load and performance
+- root cause of an application error
+
+### Cloud trail
+
+- can log all AWS API calls occuring in your account
+- thereby facilitates an audit / review
+- logs sto S3 or AWS CloudWatch
+
+When creating a trail, you need to specify
+
+- sink: S3 bucket, AWS Cloudwatch, encryption
+- events (management, data, insighs)
+
+### Cloudwatch
+
+- collects data in the form of logs, metrics and events
+- many AWS services can send data to Cloudwatch
+- set alarms and triggers
+
+### Lab: Cloudwatch
+
+- create cloudwatch rule
+  - Upon any EC2 instance changing its state to running
+  - publish to a SNS topic
+- use SNS topic with email subscription from previous lab
+
+### Infrastructure as Code (IaC) & CloudFormation
+
+- allows you to describe (cloud) infrastructure in code and provision it
+- benefits:
+  - reproducible
+  - time efficient
+  - modular
+  - version controlled
+
+CloudFormation
+
+- is the IaC service from AWS
+- found under Management & Governance
+- provides a graphic tool (Designer)
+  - drag & drop
+  - export design to yaml
+- each script represents a _stack_
+
+### AWS CLI
+
+- some features are even ONLY available via CLI (but mostly same)
+
+```zsh
+# The s3api set of commands is a 1:1 mapping with the low level S3 API. The s3 set of commands adds some higher level functionalities, like syncing for example
+BUCKET_NAME=my-033212455158asdfasdf-bucket
+aws s3api  create-bucket --bucket $BUCKET_NAME --acl public-read-write
+aws s3api put-object --bucket $BUCKET_NAME --key syllabus.pdf --body syllabus.pdf
+```
+
 ## PROJECT: deploy static website on AWS
+
