@@ -601,3 +601,39 @@ aws s3api put-object --bucket $BUCKET_NAME --key syllabus.pdf --body syllabus.pd
 
 ## PROJECT: deploy static website on AWS
 
+
+Cloud Services
+- Amazon Web Services S3 - Resource hosting and deployments
+- AWS CloudFront - CDN for SPA
+- AWS EKS - Backend API
+- AWS DynamoDB - Persistent Datastore
+- AWS Cognito - User Authentication
+
+
+Performance Tracking and DevOps Tools:
+- Performance and Health checks
+  -  AWS CloudWatch
+- Bug reporting
+  - Sentry
+- Usage Reporting
+  - Google Analytics
+  - Mixpanel
+- CI/CD
+  - Travis
+
+Frameworks
+- Ionic (Javascript) for Frontend
+- Node.js (Javascript) for Frontend
+
+```bash
+# upload files to S3 bucket
+aws s3 ls
+BUCKET_NAME=my-bucket-008678026353
+aws s3api put-object --bucket $BUCKET_NAME --key index.html --body index.html
+aws s3 cp vendor/ s3://$BUCKET_NAME/vendor/ --recursive 
+aws s3 cp css/ s3://$BUCKET_NAME/css/ --recursive 
+aws s3 cp img/ s3://$BUCKET_NAME/img/ --recursive 
+
+# why only download?
+curl -I http://my-bucket-008678026353.s3-website-us-east-1.amazonaws.com/index.html
+```
