@@ -209,6 +209,22 @@ aws cloudformation create-stack --stack-name $1 --template-body file://$2  --par
 
 ## Servers and Security Groups
 
+Based upon the previous lesson, we now create...
+- security groups (firewalls) for load-balancer and web-server
+- autoscaling group
+- EC2 launch configuration
+- load balancer
+
+### Lessons learned
+
+- Reminder:
+  - Autoscaling group requires a Launch config (LC) OR a Launch template (LT)
+    - LT are newer than LC and are recommended now to..
+      - get all latests features
+      - get versioning
+    - LC has the benefit that it is immutable
+    - LT can be generated FROM LC
+
 ## Storage and Databases
 
 # Deploy a high-availability web app using CloudFormation
