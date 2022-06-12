@@ -1,0 +1,19 @@
+AWSTemplateFormatVersion: 2010-09-09
+Description: Second try to create a resourceResources
+Resources:
+  myEC2Instance:
+    Type: AWS::EC2::Instance
+    Properties:
+      # KeyName: # name of the key pair
+      # DisableApiTermination: 
+      ImageId: ami-0ca285d4c2cda3300  
+      InstanceType: t2.micro
+      # Monitoring: true|false  # default=false=basic monitoring
+      # SecurityGroupIds:
+      #   - sg-id
+      # UserData: !Base64 |
+      #   #!/bin/bash -ex
+      #   # put your script here
+      # Tags:
+      #   - Key: key
+      #    y Value: value

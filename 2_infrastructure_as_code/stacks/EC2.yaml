@@ -1,0 +1,65 @@
+Description: foo
+Resources:
+  MyEC2:
+    Type: AWS::EC2::Instance
+    Properties:
+      AdditionalInfo: some info
+    # Properties: 
+    #   ImageId: ami-0ca285d4c2cda3300  # 
+    #   InstanceType: 
+      # AdditionalInfo: my-additional-info
+      # Affinity: String
+      # AvailabilityZone: String
+      # BlockDeviceMappings: 
+      #   - BlockDeviceMapping
+      # CpuOptions: 
+      #   CpuOptions
+      # CreditSpecification: 
+      #   CreditSpecification
+      # DisableApiTermination: Boolean
+      # EbsOptimized: Boolean
+      # ElasticGpuSpecifications: 
+      #   - ElasticGpuSpecification
+      # ElasticInferenceAccelerators: 
+      #   - ElasticInferenceAccelerator
+      # EnclaveOptions: 
+      #   EnclaveOptions
+      # HibernationOptions: 
+      #   HibernationOptions
+      # HostId: String
+      # HostResourceGroupArn: String
+      # IamInstanceProfile: String
+      # InstanceInitiatedShutdownBehavior: String
+      # InstanceType: String
+      # Ipv6AddressCount: Integer
+      # Ipv6Addresses: 
+      #   - InstanceIpv6Address
+      # KernelId: String
+      # KeyName: String
+      # LaunchTemplate: 
+      #   LaunchTemplateSpecification
+      # LicenseSpecifications: 
+      #   - LicenseSpecification
+      # Monitoring: Boolean
+      # NetworkInterfaces: 
+      #   - NetworkInterface
+      # PlacementGroupName: String
+      # PrivateDnsNameOptions: 
+      #   PrivateDnsNameOptions
+      # PrivateIpAddress: String
+      # PropagateTagsToVolumeOnCreation: Boolean
+      # RamdiskId: String
+      # SecurityGroupIds: 
+      #   - String
+      # SecurityGroups: 
+      #   - String
+      # SourceDestCheck: Boolean
+      # SsmAssociations: 
+      #   - SsmAssociation
+      # SubnetId: String
+      # Tags: 
+      #   - Tag
+      # Tenancy: String
+      # UserData: String
+      # Volumes: 
+      #   - Volume
