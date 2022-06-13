@@ -28,6 +28,18 @@ Resources:
           FromPort: 80
           ToPort: 80
           CidrIp: 0.0.0.0/0
+        # Also open port 8080 so that load balancer
+        # can talk to apache web server!
+        - IpProtocol: tcp
+          FromPort: 8080
+          ToPort: 8080
+          CidrIp: 0.0.0.0/0
+          # QUESTION: Also IPv6 via ::/0 ?
+        # - IpProtocol: tcp
+        #   FromPort: 8080
+        #   ToPort: 8080
+        #   # ::/0 indicates IPv6 format
+        #   CidrIp: ::/0
 
   WebServerSecGroup:
     Type: AWS::EC2::SecurityGroup
@@ -37,11 +49,14 @@ Resources:
         Fn::ImportValue:
           !Sub "${EnvironmentName}-VPCID"
       SecurityGroupIngress:
-      # port 8080 is usually used for personal web servers?
-      # Ah, also for Apache Tomcat webserver
+      # port 8080 for Apache Tomcat webserver
       - IpProtocol: tcp
         FromPort: 8080
         ToPort: 8080
+        CidrIp: 0.0.0.0/0
+      - IpProtocol: tcp
+        FromPort: 80
+        ToPort: 80
         CidrIp: 0.0.0.0/0
       - IpProtocol: tcp
         FromPort: 22
@@ -90,6 +105,8 @@ Resources:
             cd /var/www/html
             echo "Udacity Demo Web Server Up and Running!" > index.html
         ImageId: ami-00ddb0e5626798373
+        # ImageId: ami-0ac73f33a1888c64a
+        # ImageId: 0d1cd67c26f5fca19 ?!?!
         KeyName: VocareumKey2
         SecurityGroupIds:
         # tutorial says only IDs are allowed, but works?!
@@ -102,20 +119,71 @@ Resources:
 
   WebAppGroup:
     Type: AWS::AutoScaling::AutoScalingGroup
+    DependsOn:
+      - WebServerSecGroup
     Properties:
       VPCZoneIdentifier:
       - Fn::ImportValue: 
+          # switch to public nets for testing purposes
           !Sub "${EnvironmentName}-PRIVATE-NETS"
       # LaunchConfigurationName:
         # Ref: WebAppLaunchConfig
       LaunchTemplate:
         LaunchTemplateId: !Ref WebAppLaunchTemplate
         Version: !Ref LaunchTemplateVersionNumber
-      MinSize: '3'
+      MinSize: '2'
       MaxSize: '5'
-      # TargetGroupARNs:
-      # - Ref: WebAppTargetGroup
+      TargetGroupARNs:
+      - Ref: WebAppTargetGroup
       HealthCheckGracePeriod: 60
       HealthCheckType: ELB
+
+  WebAppTargetGroup:
+    Type: AWS::ElasticLoadBalancingV2::TargetGroup
+    Properties:
+      HealthCheckIntervalSeconds: 10
+      HealthCheckPath: /
+      HealthCheckProtocol: HTTP
+      HealthCheckTimeoutSeconds: 8
+      HealthyThresholdCount: 2
+      Port: 80
+      Protocol: HTTP
+      UnhealthyThresholdCount: 5
+      VpcId: 
+        Fn::ImportValue:
+          Fn::Sub: "${EnvironmentName}-VPCID"
+
+  WebAppLB:
+    Type: AWS::ElasticLoadBalancingV2::LoadBalancer
+    Properties:
+      Subnets:
+      - Fn::ImportValue: !Sub "${EnvironmentName}-PUBLIC-NET1"
+      - Fn::ImportValue: !Sub "${EnvironmentName}-PUBLIC-NET2"
+      SecurityGroups:
+      - Ref: LBSecGroup
+
+  Listener:
+    Type: AWS::ElasticLoadBalancingV2::Listener
+    Properties:
+      DefaultActions:
+      - Type: forward
+        TargetGroupArn:
+          Ref: WebAppTargetGroup
+      LoadBalancerArn:
+        Ref: WebAppLB
+      Port: '80'
+      Protocol: HTTP
+
+  ALBListenerRule:
+      Type: AWS::ElasticLoadBalancingV2::ListenerRule
+      Properties:
+        Actions:
+        - Type: forward
+          TargetGroupArn: !Ref 'WebAppTargetGroup'
+        Conditions:
+        - Field: path-pattern
+          Values: [/]
+        ListenerArn: !Ref 'Listener'
+        Priority: 1
 
 # Outputs

@@ -5,7 +5,7 @@
 FILESTEM="servers"
 
 aws cloudformation \
-update-stack \
+create-stack \
 --stack-name "udacity-iac-${FILESTEM}" \
 --template-body "file:///mnt/sda1/projects/git/courses/udacity_cloud_devops/2_infrastructure_as_code/networking_infrastructure/${FILESTEM}.yaml"  \
 --parameters "file:///mnt/sda1/projects/git/courses/udacity_cloud_devops/2_infrastructure_as_code/networking_infrastructure/${FILESTEM}-params.json" \
@@ -13,4 +13,7 @@ update-stack \
 
 # create with capabilities
 aws cloudformation create-stack --stack-name $1 --template-body file://$2  --parameters file://$3 --capabilities "CAPABILITY_IAM" "CAPABILITY_NAMED_IAM" --region=us-east-1
+
+# connect to IP adreess
+ssh -i
 ```

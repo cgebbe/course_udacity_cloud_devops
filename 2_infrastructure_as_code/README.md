@@ -224,6 +224,53 @@ Based upon the previous lesson, we now create...
       - get versioning
     - LC has the benefit that it is immutable
     - LT can be generated FROM LC
+- Debugg `unhealthy`
+
+### Relation between Load Balancer and Autoscaling Group
+
+- A load balancer is a device that simply forwards traffic, evenly across a group of servers, known as a Target Group.
+- The problem is, we can’t specifically name those servers, because if they are part of an Auto Scaling group, this means that they can come and go as demand for your application increases or decreases.
+- The way around this is, using the TargetGroupARNs (ARN=Amazon Resource Name) property of the Auto Scaling group. In this way, all servers launched via the autoscaling policy will be registered in the target group from the load balancer.
+
+![](README.assets/2022-06-12-22-10-08.png)
+
+### Jump box to access servers in private subnet
+
+- Create a server called "jumpbox" in a public subnet
+  - with a security group that only allows SSH inbound traffic from YOUR IP.
+- SSH into your public jumpbox server
+  - `ssh user@ip -i path/to/key.pem`
+- Setup SSH for your private servers
+- download SSH key to your computer
+- secure copy the SSH key for your private servers to your jumbbox via `scp`
+  - `scp -i path/to/key.pem path/to/local/src user@ip:/path/to/dst
+
+### Default username of ec2 instances
+
+https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/connection-prereqs.html
+
+Get the default user name for the AMI that you used to - launch your instance:
+- For Amazon Linux 2 or the Amazon Linux AMI, the user name is ec2-user.
+- For a CentOS AMI, the user name is centos or ec2-user.
+- For a Debian AMI, the user name is admin.
+- For a Fedora AMI, the user name is fedora or ec2-user.
+- For a RHEL AMI, the user name is ec2-user or root.
+- For a SUSE AMI, the user name is ec2-user or root.
+- For an Ubuntu AMI, the user name is ubuntu.
+- For an Oracle AMI, the user name is ec2-user.
+- For a Bitnami AMI, the user name is bitnam
+- Otherwise, check with the AMI provider.
+
+### TODO
+
+- access EC2 instance via SSH -> works with 
+  - Opening port 80 in security group (this is where apache server runs)
+  - `MapPublicIpOnLaunch: true` for all subnets
+  - `ssh -i ~/Desktop/VocareumKey2.pem ubuntu@18.234.149.37`
+  - `service apache2 status`
+- access to one EC2 instance (currently not possible)
+- access via load balancer
+- fix unhealthy status
 
 ## Storage and Databases
 
