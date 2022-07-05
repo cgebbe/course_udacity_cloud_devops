@@ -202,7 +202,7 @@ aws cloudformation create-stack --stack-name $1 --template-body file://$2  --par
 
 ### Lessons learned
 
-- renaming *can* create issues
+- renaming _can_ create issues
   - Problem: Could not delete Internet Gateway Attachment after renaming because NAT gateways already had public IP addresses assigned
   - Solution: Keep names the same or delete full stack
 - NAT gateway is slow to create
@@ -210,6 +210,7 @@ aws cloudformation create-stack --stack-name $1 --template-body file://$2  --par
 ## Servers and Security Groups
 
 Based upon the previous lesson, we now create...
+
 - security groups (firewalls) for load-balancer and web-server
 - autoscaling group
 - EC2 launch configuration
@@ -234,6 +235,8 @@ Based upon the previous lesson, we now create...
 
 ![](README.assets/2022-06-12-22-10-08.png)
 
+![](README.assets/2022-07-04-09-36-50.png)
+
 ### Jump box to access servers in private subnet
 
 - Create a server called "jumpbox" in a public subnet
@@ -250,6 +253,7 @@ Based upon the previous lesson, we now create...
 https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/connection-prereqs.html
 
 Get the default user name for the AMI that you used to - launch your instance:
+
 - For Amazon Linux 2 or the Amazon Linux AMI, the user name is ec2-user.
 - For a CentOS AMI, the user name is centos or ec2-user.
 - For a Debian AMI, the user name is admin.
@@ -263,7 +267,7 @@ Get the default user name for the AMI that you used to - launch your instance:
 
 ### TODO
 
-- access EC2 instance via SSH -> works with 
+- access EC2 instance via SSH -> works with
   - Opening port 80 in security group (this is where apache server runs)
   - `MapPublicIpOnLaunch: true` for all subnets
   - `ssh -i ~/Desktop/VocareumKey2.pem ubuntu@18.234.149.37`
@@ -274,4 +278,77 @@ Get the default user name for the AMI that you used to - launch your instance:
 
 ## Storage and Databases
 
-# Deploy a high-availability web app using CloudFormation
+TODO
+
+- 4 Create aurora database in UI
+- 8 create bucket and upload file via console
+  - ah, no, simply `aws s3 cp /src/path s3://dst/path`
+
+### RDS Database
+
+It is recommended to setup the database using the console (or UI) to avoid accidental deletion when running the cloudformation script. Also, there's little benefit in using cloudformation as it is a one-time thing.
+
+If you choose to use a cloudformation script, be sure to use _Retention Policy_ to prevent data deletion. This property keeps a service even if the entire stack of infrastructure is marked for removal. In CloudFormation, the syntax is DeletionPolicy: retain.
+
+### S3
+
+- again, rather create using console or UI
+- Your servers don't need credentials to access S3 provided they have an IAM role assigned.
+- We recommend you choose RDS as opposed to installing a database in your own servers that you have to manage and back up yourself.
+
+## Deploy a high-availability web app using CloudFormation
+
+### Supporting material
+
+- https://github.com/udacity/nd9991-c2-Infrastructure-as-Code-v1/tree/master/project_starter
+  - although text should say "it works! Udagram, Udacity"
+- see also old YAML starter code here: https://knowledge.udacity.com/questions/123109
+
+```bash
+#!/bin/bash
+apt-get update -y
+apt-get install apache2 -y
+systemctl start apache2.service
+cd /var/www/html
+
+# Create a dummy page...
+echo "Udacity Demo Web Server Up and Running!" > index.html
+
+# ...or download s3 content.
+apt-get install unzip awscli -y
+aws s3 cp s3://udacity-demo-1/udacity.zip .
+unzip -o udacity.zip
+```
+
+### IP for load balancer
+
+[An Application Load Balancer cannot be assigned an Elastic IP address (static IP address). However, a Network Load Balancer can be assigned one Elastic IP address for each Availability Zone it uses. If you do not wish to use a Network Load Balancer, you can combine the two by putting the Network Load Balancer in front of the Application Load Balancer.](https://stackoverflow.com/a/55243777/2135504)
+
+### x86 vs ARM processor architecture
+
+- [x86 for maximum performance, ARM for power efficiency](https://vasexperts.com/blog/telecom/whats-better-x86-or-arm/)
+- ARM [is a simpler architecture leading to lots of power save features](https://stackoverflow.com/a/14795541/2135504)
+  - therefore, ARM used in mobile phones mainly
+- The [computational performance of AWS’s Arm EC2 instances is similar to that of the x86_64 instances](https://www.infoq.com/articles/arm-vs-x86-cloud-performance/)
+- ARM instances are significantly cheaper
+
+### Pick instance type and AMI
+
+> You'll need two vCPUs and at least 4GB of RAM. The Operating System to be used is Ubuntu 18. So, choose an Instance size and Machine Image (AMI) that best fits this spec.
+
+As instance type, pick [t3.medium](https://aws.amazon.com/ec2/instance-types/?trk=1c70ffc0-2c7c-41d2-802c-21145de63ecb&sc_channel=ps&sc_campaign=acquisition&sc_medium=ACQ-P|PS-GO|Brand|Desktop|SU|Compute|EC2|DACH|EN|Text|EU&s_kwcid=AL!4422!3!536451478217!b!!g!!%2Baws%20%2Bec2%20%2Binstance%20%2Btypes&ef_id=Cj0KCQjwn4qWBhCvARIsAFNAMii3atZCSM5GVSgO8L7OxWRl0mY3sEA09hcuXap1kGr5ao3XqCEeMEoaAhb1EALw_wcB:G:s&s_kwcid=AL!4422!3!536451478217!b!!g!!%2Baws%20%2Bec2%20%2Binstance%20%2Btypes) with 2vCPUs and 4GB Ram. Ah, submission criteria says [t3.small suffices](https://review.udacity.com/#!/rubrics/2556/view).
+
+For AMI see AMI catalog
+
+- ami-0f1aec6bc79ad857c
+  - Deep Learning AMI (Ubuntu 18.04) Version 62.0
+  - likely overkill, choose another
+- ami-0729e439b6769d6ab (64-bit (x86)) / ami-0ca951dd3a6f8cbfc (64-bit (Arm))
+  - Ubuntu Server 18.04 LTS (HVM), SSD Volume Type
+  - even free tier eligible
+
+### Submission criteria
+
+- Use LaunchConfiguration (instead of template)
+- Provide a working server with URL
+- SSH key: There shouldn’t be a ‘keyname’ property in the launch config

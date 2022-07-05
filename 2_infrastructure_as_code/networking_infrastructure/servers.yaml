@@ -14,7 +14,7 @@ Resources:
   LBSecGroup:  # load balancer
     Type: AWS::EC2::SecurityGroup
     Properties:
-      GroupDescription: Allo HTTP to load balancer
+      GroupDescription: Allow HTTP to load balancer
       VpcId:
         Fn::ImportValue:
           !Sub "${EnvironmentName}-VPCID"
@@ -27,7 +27,7 @@ Resources:
         - IpProtocol: tcp
           FromPort: 80
           ToPort: 80
-          CidrIp: 0.0.0.0/0
+          CidrIp: 0.0.0.0/0 
         # Also open port 8080 so that load balancer
         # can talk to apache web server!
         - IpProtocol: tcp
@@ -161,6 +161,7 @@ Resources:
       - Fn::ImportValue: !Sub "${EnvironmentName}-PUBLIC-NET2"
       SecurityGroups:
       - Ref: LBSecGroup
+      # Type: application # default type
 
   Listener:
     Type: AWS::ElasticLoadBalancingV2::Listener
@@ -186,4 +187,10 @@ Resources:
         ListenerArn: !Ref 'Listener'
         Priority: 1
 
-# Outputs
+Outputs:
+  # from https://stackoverflow.com/a/60635188/2135504
+  LoadBalancerUrl:
+    Description: The URL of the ALB
+    Value: !GetAtt WebAppLB.DNSName
+    Export:
+      Name: !Sub ${EnvironmentName}-ELB-DNS
