@@ -1,12 +1,18 @@
 # Deploy a Web App using Cloudformation
 
-The project is very similar to the lectures, so we can reuse most of the existing scripts.
+The Udagram project is currently accessible on the [this URL](http://udaci-webap-2rtpnnan14yf-133479692.us-east-1.elb.amazonaws.com/) and should read:
+
+> it works! Udagram, Udacity served from S3
+
+## Architecture diagram
 
 ![](architecture_diagram.png)
 
-## Create network infrastructure
+## Creation steps
 
-The network infrastructure is exactly the same as in the
+### Create network infrastructure
+
+Create the network infrastructure in exactly the same way as in the lecture:
 
 ```bash
 ROOT_PATH="file:///mnt/sda1/projects/git/courses/udacity_cloud_devops/2_infrastructure_as_code/project"
@@ -21,7 +27,7 @@ create-stack \
 --region=us-east-1
 ```
 
-## Create S3-bucket with content
+### Create S3-bucket with content
 
 Create the S3 bucket via the CLI instead of a CloudFormation script as advised in the lecture.
 
@@ -34,7 +40,7 @@ echo 'it works! Udagram, Udacity served from S3!' > index.html
 aws s3 cp index.html s3://my-930812052113-bucket/index.html
 ```
 
-## Create servers
+### Create servers
 
 Setup your [EC2 instance with automatic aws cli access](https://docs.aws.amazon.com/cli/latest/userguide/cli-configure-metadata.html).
 
@@ -42,22 +48,10 @@ Setup your [EC2 instance with automatic aws cli access](https://docs.aws.amazon.
 # setup server infrastructure
 FILESTEM="servers"
 aws cloudformation \
-update-stack \
+create-stack \
 --stack-name="udacity-iac-${FILESTEM}" \
 --template-body="${ROOT_PATH}/${FILESTEM}.yaml"  \
 --parameters="${ROOT_PATH}/${FILESTEM}-params.json" \
 --region=us-east-1 \
 --capabilities CAPABILITY_NAMED_IAM
-
-# check status of apache
-sudo systemctl status apache2
-```
-
-## download stuff from aws
-
-```bash
-# this works without extra configuration
-cd /var/www/html/
-sudo aws s3 cp s3://my-930812052113-bucket/index.html index.html
-
 ```

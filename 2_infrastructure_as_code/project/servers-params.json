@@ -1,7 +1,14 @@
 [
-    {
-        "ParameterKey": "EnvironmentName",
-        "ParameterValue": "UdacityProject"
-    }
-   ]
-   
+  {
+    "ParameterKey": "EnvironmentName",
+    "ParameterValue": "UdacityProject"
+  },
+  {
+    "ParameterKey": "MinServerCount",
+    "ParameterValue": "2"
+  },
+  {
+    "ParameterKey": "MaxServerCount",
+    "ParameterValue": "5"
+  }
+]

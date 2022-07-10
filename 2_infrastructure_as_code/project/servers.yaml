@@ -8,6 +8,10 @@ Parameters:
   LaunchTemplateVersionNumber:
     Type: String
     Default: 1
+  MinServerCount:
+    Type: String
+  MaxServerCount:
+    Type: String
 
 Resources:
   ###########################################################################
@@ -88,7 +92,7 @@ Resources:
           systemctl start apache2.service
       ImageId: ami-00ddb0e5626798373
       # This is your SSH keypair, which you need to create before!
-      KeyName: VocareumKey2
+      # KeyName: VocareumKey2
       IamInstanceProfile:
         Ref: EC2instanceProfile
       SecurityGroups:
@@ -138,8 +142,8 @@ Resources:
       # LaunchTemplate:
       #   LaunchTemplateId: !Ref WebAppLaunchTemplate
       #   Version: !Ref LaunchTemplateVersionNumber
-      MinSize: "1"
-      MaxSize: "5"
+      MinSize: !Sub ${MinServerCount}
+      MaxSize: !Sub ${MaxServerCount}
       TargetGroupARNs:
         - Ref: WebAppTargetGroup
       HealthCheckGracePeriod: 60
