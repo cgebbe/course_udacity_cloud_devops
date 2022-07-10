@@ -132,7 +132,7 @@ Resources:
       VPCZoneIdentifier:
         - Fn::ImportValue:
             # switch to public nets for testing purposes
-            !Sub "${EnvironmentName}-PUBLIC-NETS"
+            !Sub "${EnvironmentName}-PRIVATE-NETS"
       LaunchConfigurationName:
         Ref: WebAppLaunchConfig
       # LaunchTemplate:
