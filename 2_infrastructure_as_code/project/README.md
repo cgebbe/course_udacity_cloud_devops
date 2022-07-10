@@ -16,8 +16,6 @@ Create the network infrastructure in exactly the same way as in the lecture:
 
 ```bash
 ROOT_PATH="file:///mnt/sda1/projects/git/courses/udacity_cloud_devops/2_infrastructure_as_code/project"
-
-# setup network infrastructure
 FILESTEM="network"
 aws cloudformation \
 create-stack \
@@ -42,10 +40,9 @@ aws s3 cp index.html s3://my-930812052113-bucket/index.html
 
 ### Create servers
 
-Setup your [EC2 instance with automatic aws cli access](https://docs.aws.amazon.com/cli/latest/userguide/cli-configure-metadata.html).
+The CloudFormation script assigns an IAM role to the EC2 instances. [When an IAM role is attached to the instance, the AWS CLI automatically and securely retrieves the credentials from the instance metadata](https://docs.aws.amazon.com/cli/latest/userguide/cli-configure-metadata.html). Therefore, we don't need to `aws configure`.
 
 ```bash
-# setup server infrastructure
 FILESTEM="servers"
 aws cloudformation \
 create-stack \
