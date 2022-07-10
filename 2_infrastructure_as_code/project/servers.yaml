@@ -1,7 +1,7 @@
 AWSTemplateFormatVersion: 2010-09-09
 Description: Udacity / Cloud Devops / IAC / Servers
 
-Parameters: 
+Parameters:
   EnvironmentName:
     Type: String
     Description: used to prefix
@@ -9,65 +9,36 @@ Parameters:
     Type: String
     Default: 1
 
-Resources: 
-
-  # LBSecGroup:  # load balancer
-  #   Type: AWS::EC2::SecurityGroup
-  #   Properties:
-  #     GroupDescription: Allow HTTP to load balancer
-  #     VpcId:
-  #       Fn::ImportValue:
-  #         !Sub "${EnvironmentName}-VPCID"
-  #     SecurityGroupIngress:
-  #       - IpProtocol: tcp
-  #         FromPort: 80
-  #         ToPort: 80
-  #         CidrIp: 0.0.0.0/0
-  #     SecurityGroupEgress:
-  #       - IpProtocol: tcp
-  #         FromPort: 80
-  #         ToPort: 80
-  #         CidrIp: 0.0.0.0/0 
-  #       # Also open port 8080 so that load balancer
-  #       # can talk to apache web server!
-  #       - IpProtocol: tcp
-  #         FromPort: 8080
-  #         ToPort: 8080
-  #         CidrIp: 0.0.0.0/0
-  #         # QUESTION: Also IPv6 via ::/0 ?
-  #       # - IpProtocol: tcp
-  #       #   FromPort: 8080
-  #       #   ToPort: 8080
-  #       #   # ::/0 indicates IPv6 format
-  #       #   CidrIp: ::/0
+Resources:
+  ###########################################################################
+  ### Server
 
   WebServerSecGroup:
     Type: AWS::EC2::SecurityGroup
     Properties:
       GroupDescription: Allow http to our hosts and SSH from local only
       VpcId:
-        Fn::ImportValue:
-          !Sub "${EnvironmentName}-VPCID"
+        Fn::ImportValue: !Sub "${EnvironmentName}-VPCID"
       SecurityGroupIngress:
-      # port 8080 for Apache Tomcat webserver
-      # - IpProtocol: tcp
-      #   FromPort: 8080
-      #   ToPort: 8080
-      #   CidrIp: 0.0.0.0/0
-      - IpProtocol: tcp
-        FromPort: 80
-        ToPort: 80
-        CidrIp: 0.0.0.0/0
-      - IpProtocol: tcp
-        FromPort: 22
-        ToPort: 22
-        CidrIp: 0.0.0.0/0
+        # port 8080 for Apache Tomcat webserver
+        # - IpProtocol: tcp
+        #   FromPort: 8080
+        #   ToPort: 8080
+        #   CidrIp: 0.0.0.0/0
+        - IpProtocol: tcp
+          FromPort: 80
+          ToPort: 80
+          CidrIp: 0.0.0.0/0
+        - IpProtocol: tcp
+          FromPort: 22
+          ToPort: 22
+          CidrIp: 0.0.0.0/0
       SecurityGroupEgress:
-      # open all TCP ports for e.g. downloading updates
-      - IpProtocol: tcp
-        FromPort: 0
-        ToPort: 65535
-        CidrIp: 0.0.0.0/0
+        # open all TCP ports for e.g. downloading updates
+        - IpProtocol: tcp
+          FromPort: 0
+          ToPort: 65535
+          CidrIp: 0.0.0.0/0
 
   EC2ReadS3Role:
     Type: AWS::IAM::Role
@@ -80,7 +51,7 @@ Resources:
               Service:
                 - ec2.amazonaws.com
             Action:
-              - 'sts:AssumeRole'
+              - "sts:AssumeRole"
       Policies:
         - PolicyName: ec-reads-s3-policy
           PolicyDocument:
@@ -88,16 +59,16 @@ Resources:
             Statement:
               - Effect: Allow
                 Action:
-                - s3:Get*
-                - s3:List*
-                - s3-object-lambda:Get*
-                - s3-object-lambda:List*
+                  - s3:Get*
+                  - s3:List*
+                  - s3-object-lambda:Get*
+                  - s3-object-lambda:List*
                 Resource: "*"
 
   EC2instanceProfile:
     Type: AWS::IAM::InstanceProfile
-    Properties: 
-      Roles: 
+    Properties:
+      Roles:
         - Ref: EC2ReadS3Role
 
   WebAppLaunchConfig:
@@ -109,7 +80,7 @@ Resources:
           apt-get update -y
           apt-get install apache2 -y
           apt-get install awscli -y
-          
+
           cd /var/www/html
           # echo "Udacity Demo Web Server Up and Running!" > index.html
           sudo aws s3 cp s3://my-930812052113-bucket/index.html index.html
@@ -121,16 +92,16 @@ Resources:
       IamInstanceProfile:
         Ref: EC2instanceProfile
       SecurityGroups:
-      - Ref: WebServerSecGroup
+        - Ref: WebServerSecGroup
       InstanceType: t3.small
       BlockDeviceMappings:
-      - DeviceName: "/dev/sdk"
-        Ebs:
-          VolumeSize: '10'
+        - DeviceName: "/dev/sdk"
+          Ebs:
+            VolumeSize: "10"
 
   # WebAppLaunchTemplate:
   #   Type: AWS::EC2::LaunchTemplate
-  #   Properties: 
+  #   Properties:
   #     LaunchTemplateData:
   #       UserData:
   #         Fn::Base64: !Sub |
@@ -145,88 +116,119 @@ Resources:
   #       # ImageId: 0d1cd67c26f5fca19 ?!?!
   #       KeyName: VocareumKey2
   #       SecurityGroupIds:
-  #       # tutorial says only IDs are allowed, but works?!
+  #         # tutorial says only IDs are allowed, but works?!
   #         - Ref: WebServerSecGroup
   #       InstanceType: t3.small
   #       BlockDeviceMappings:
-  #       - DeviceName: "/dev/sdk"
-  #         Ebs:
-  #           VolumeSize: '10'
+  #         - DeviceName: "/dev/sdk"
+  #           Ebs:
+  #             VolumeSize: "10"
 
   WebAppGroup:
     Type: AWS::AutoScaling::AutoScalingGroup
-    # DependsOn:
-    #   - WebServerSecGroup
+    DependsOn:
+      - WebServerSecGroup
     Properties:
       VPCZoneIdentifier:
-      - Fn::ImportValue: 
-          # switch to public nets for testing purposes
-          !Sub "${EnvironmentName}-PUBLIC-NETS"
+        - Fn::ImportValue:
+            # switch to public nets for testing purposes
+            !Sub "${EnvironmentName}-PUBLIC-NETS"
       LaunchConfigurationName:
         Ref: WebAppLaunchConfig
       # LaunchTemplate:
       #   LaunchTemplateId: !Ref WebAppLaunchTemplate
       #   Version: !Ref LaunchTemplateVersionNumber
-      MinSize: '1'
-      MaxSize: '5'
-      # TargetGroupARNs:
-      # - Ref: WebAppTargetGroup
+      MinSize: "1"
+      MaxSize: "5"
+      TargetGroupARNs:
+        - Ref: WebAppTargetGroup
       HealthCheckGracePeriod: 60
       HealthCheckType: ELB
 
-  # WebAppTargetGroup:
-  #   Type: AWS::ElasticLoadBalancingV2::TargetGroup
-  #   Properties:
-  #     HealthCheckIntervalSeconds: 10
-  #     HealthCheckPath: /
-  #     HealthCheckProtocol: HTTP
-  #     HealthCheckTimeoutSeconds: 8
-  #     HealthyThresholdCount: 2
-  #     Port: 80
-  #     Protocol: HTTP
-  #     UnhealthyThresholdCount: 5
-  #     VpcId: 
-  #       Fn::ImportValue:
-  #         Fn::Sub: "${EnvironmentName}-VPCID"
+  ###########################################################################
+  ### Autoscaling group and load balancer
 
-  # WebAppLB:
-  #   Type: AWS::ElasticLoadBalancingV2::LoadBalancer
-  #   Properties:
-  #     Subnets:
-  #     - Fn::ImportValue: !Sub "${EnvironmentName}-PUBLIC-NET1"
-  #     - Fn::ImportValue: !Sub "${EnvironmentName}-PUBLIC-NET2"
-  #     SecurityGroups:
-  #     - Ref: LBSecGroup
-  #     # Type: application # default type
+  LBSecGroup: # load balancer
+    Type: AWS::EC2::SecurityGroup
+    Properties:
+      GroupDescription: Allow HTTP to load balancer
+      VpcId:
+        Fn::ImportValue: !Sub "${EnvironmentName}-VPCID"
+      SecurityGroupIngress:
+        - IpProtocol: tcp
+          FromPort: 80
+          ToPort: 80
+          CidrIp: 0.0.0.0/0
+      SecurityGroupEgress:
+        - IpProtocol: tcp
+          FromPort: 80
+          ToPort: 80
+          CidrIp: 0.0.0.0/0
+        # Also open port 8080 so that load balancer
+        # can talk to apache web server!
+        # - IpProtocol: tcp
+        #   FromPort: 8080
+        #   ToPort: 8080
+        #   CidrIp: 0.0.0.0/0
+        # QUESTION: Also IPv6 via ::/0 ?
+        # - IpProtocol: tcp
+        #   FromPort: 8080
+        #   ToPort: 8080
+        #   # ::/0 indicates IPv6 format
+        #   CidrIp: ::/0
+  WebAppTargetGroup:
+    Type: AWS::ElasticLoadBalancingV2::TargetGroup
+    Properties:
+      HealthCheckIntervalSeconds: 10
+      HealthCheckPath: /
+      HealthCheckProtocol: HTTP
+      HealthCheckTimeoutSeconds: 8
+      HealthyThresholdCount: 2
+      Port: 80
+      Protocol: HTTP
+      UnhealthyThresholdCount: 5
+      VpcId:
+        Fn::ImportValue:
+          Fn::Sub: "${EnvironmentName}-VPCID"
 
-  # Listener:
-  #   Type: AWS::ElasticLoadBalancingV2::Listener
-  #   Properties:
-  #     DefaultActions:
-  #     - Type: forward
-  #       TargetGroupArn:
-  #         Ref: WebAppTargetGroup
-  #     LoadBalancerArn:
-  #       Ref: WebAppLB
-  #     Port: '80'
-  #     Protocol: HTTP
+  WebAppLB:
+    Type: AWS::ElasticLoadBalancingV2::LoadBalancer
+    Properties:
+      Subnets:
+        - Fn::ImportValue: !Sub "${EnvironmentName}-PUBLIC-NET1"
+        - Fn::ImportValue: !Sub "${EnvironmentName}-PUBLIC-NET2"
+      SecurityGroups:
+        - Ref: LBSecGroup
+      # Type: application # default type
 
-  # ALBListenerRule:
-  #     Type: AWS::ElasticLoadBalancingV2::ListenerRule
-  #     Properties:
-  #       Actions:
-  #       - Type: forward
-  #         TargetGroupArn: !Ref 'WebAppTargetGroup'
-  #       Conditions:
-  #       - Field: path-pattern
-  #         Values: [/]
-  #       ListenerArn: !Ref 'Listener'
-  #       Priority: 1
+  Listener:
+    Type: AWS::ElasticLoadBalancingV2::Listener
+    Properties:
+      DefaultActions:
+        - Type: forward
+          TargetGroupArn:
+            Ref: WebAppTargetGroup
+      LoadBalancerArn:
+        Ref: WebAppLB
+      Port: "80"
+      Protocol: HTTP
 
-# Outputs:
-#   # from https://stackoverflow.com/a/60635188/2135504
-#   LoadBalancerUrl:
-#     Description: The URL of the ALB
-#     Value: !GetAtt WebAppLB.DNSName
-#     Export:
-#       Name: !Sub ${EnvironmentName}-ELB-DNS
+  ALBListenerRule:
+    Type: AWS::ElasticLoadBalancingV2::ListenerRule
+    Properties:
+      Actions:
+        - Type: forward
+          TargetGroupArn: !Ref "WebAppTargetGroup"
+      Conditions:
+        - Field: path-pattern
+          Values: [/]
+      ListenerArn: !Ref "Listener"
+      Priority: 1
+
+Outputs:
+  # from https://stackoverflow.com/a/60635188/2135504
+  LoadBalancerUrl:
+    Description: The URL of the ALB
+    Value: !GetAtt WebAppLB.DNSName
+    Export:
+      Name: !Sub ${EnvironmentName}-ELB-DNS
