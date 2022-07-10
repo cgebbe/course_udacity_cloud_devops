@@ -315,7 +315,7 @@ cd /var/www/html
 echo "Udacity Demo Web Server Up and Running!" > index.html
 
 # ...or download s3 content.
-apt-get install unzip awscli -y
+sudo apt-get install unzip awscli -y
 aws s3 cp s3://udacity-demo-1/udacity.zip .
 unzip -o udacity.zip
 ```
