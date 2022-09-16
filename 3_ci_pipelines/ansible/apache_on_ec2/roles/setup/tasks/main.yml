@@ -1,0 +1,18 @@
+# Assuming the udacity.pem and inventory files are present in the current directory
+# ansible-playbook main-remote.yml -i inventory --private-key ~/Desktop/udacity.pem
+---
+# - name: "update apt packages."
+#   become: true
+#   ansible.builtin.apt:
+#     update_cache: true
+
+- name: "install apache2"
+  become: true
+  ansible.builtin.apt:
+    name: apache2
+    update_cache: true
+
+- name: "copy file"
+  ansible.builtin.copy:
+    src: index.html
+    dest: /var/www/html/index.html

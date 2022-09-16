@@ -1,0 +1,9 @@
+# execute this playbook by running
+# ansible-playbook main.yml
+
+---
+- name: Exercise #1
+  hosts: localhost
+
+  roles:
+   - print
