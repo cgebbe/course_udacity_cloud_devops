@@ -2,9 +2,9 @@
 
 These are my notes and projects for the [Cloud DevOps Engineer Nanodegree](https://www.udacity.com/course/cloud-dev-ops-nanodegree--nd9991) by Udacity.
 
-## Nanodegree content
+## Syllabus
 
-Courses
+[Course content](syllabus.pdf)
 
 1. Cloud fundamentals
 2. Infrastructure as code
@@ -13,16 +13,12 @@ Courses
 
 Included projects
 
-1. Deploy Static Website on AWS
-2. Deploy a high-availability web app using CloudFormation
-3. Build CI/CD Pipelines, Monitoring & Logging
-4. Operationalize a Machine Learning Microservice API
-5. Unique Capstone project 
+1. [Deploy a static Website on AWS using the console](1_cloud_fundamentals/project_submission/README.md)
+2. [Deploy a high-availability web app using CloudFormation](2_infrastructure_as_code/project/README.md)
+3. [Build CI/CD Pipelines, Monitoring & Logging](https://github.com/cgebbe/cdond-c3-projectstarter/tree/master/_submission/screenshots)
+4. [Operationalize a Machine Learning Microservice API](https://github.com/cgebbe/DevOps_Microservices/tree/master/project-ml-microservice-kubernetes)
+5. [Capstone project](https://github.com/cgebbe/udacity-cloud-devops-capstone)
 
-## AWS access
+## Certificate
 
-You are given a federated user account, a temporary AWS user account with limited permissions, that you can use in this program. You can open it from within Udacity by clicking on "Open AWS Gateway". Relevant notes:
-- The time per session is limited
-- The AWS region can be changed (from default us-east-1)
-- The budget is 75$ (usually 20$ suffices). Therefore, make sure to shut down the resources!
-
+![](README.assets/2022-11-01-21-07-25.png)
